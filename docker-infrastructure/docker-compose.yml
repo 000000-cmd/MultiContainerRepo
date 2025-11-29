@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------
+  # 1. CONFIG SERVER (Cerebro)
+  # ----------------------------------------------------------------
+  config-server:
+    build: ../config-server
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/000000-cmd/SaasConfig.git
+      SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT_LABEL: main
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      JAVA_TOOL_OPTIONS: "-Xms192m -Xmx384m"
+    healthcheck:
+      test: "wget --no-verbose --tries=1 --spider http://localhost:8888/actuator/health || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  # ----------------------------------------------------------------
+  # 2. DISCOVERY SERVICE (Eureka)
+  # ----------------------------------------------------------------
+  discovery-service:
+    build: ../discovery-service
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    environment:
+      CONFIG_SERVER_URL: "http://config-server:8888"
+      EUREKA_CLIENT_REGISTERWITHEUREKA: "false"
+      EUREKA_CLIENT_FETCHREGISTRY: "false"
+      JAVA_TOOL_OPTIONS: "-Xms192m -Xmx384m"
+    depends_on:
+      config-server:
+        condition: service_healthy
+
+  # ----------------------------------------------------------------
+  # 3. GATEWAY SERVICE
+  # ----------------------------------------------------------------
+  gateway-service:
+    build: ../gateway-service
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    environment:
+      CONFIG_SERVER_URL: "http://config-server:8888"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      JAVA_TOOL_OPTIONS: "-Xms256m -Xmx512m"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_started
+
+  # ----------------------------------------------------------------
+  # AUTH SERVICE
+  # ----------------------------------------------------------------
+  # auth-service:
+  #   build: ../auth-service
+  #   container_name: auth-service
+  #   ports:
+  #     - "8082:8082"
+  #   environment:
+  #     CONFIG_SERVER_URL: "http://config-server:8888"
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+  #     # ¡IMPORTANTE! Aquí borramos las variables GLOBAL_DB_...
+  #     # Al no estar, Spring usará las que descargue del Config Server (AWS RDS)
+  #     JAVA_TOOL_OPTIONS: "-Xms256m -Xmx512m"
+  #   depends_on:
+  #     config-server:
+  #       condition: service_healthy
+  #     discovery-service:
+  #       condition: service_started
+
+# Volúmenes ya no son necesarios si no usamos mysql local
