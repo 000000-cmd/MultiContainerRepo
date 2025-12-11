@@ -7,9 +7,6 @@ import com.saasbeauty.systemservice.infrastructure.adapters.out.persistence.mapp
 import com.saasbeauty.systemservice.infrastructure.adapters.out.persistence.repository.JpaConstantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -21,16 +18,16 @@ public class DatabaseConstantAdapter implements IConstantRepositoryPort {
 
     @Override
     public Constant saveConstant(Constant constant) {
-        ConstantEntity entity = constantPersistenceMapper.toConstantEntity(constant);
+        ConstantEntity entity = constantPersistenceMapper.toEntity(constant);
         ConstantEntity saved = jpaConstantRepository.save(entity);
         return constantPersistenceMapper.toDomain(saved);
     }
 
     @Override
     public Constant updateConstant(Constant constant){
-        ConstantEntity entity = constantPersistenceMapper.toConstantEntity(constant);
-        ConstantEntity updated = jpaConstantRepository.updateConstant(entity);
-        return  constantPersistenceMapper.toDomain(updated);
+        ConstantEntity entity = constantPersistenceMapper.toEntity(constant);
+        ConstantEntity updated = jpaConstantRepository.save(entity);
+        return constantPersistenceMapper.toDomain(updated);
     }
 
     @Override
@@ -49,6 +46,7 @@ public class DatabaseConstantAdapter implements IConstantRepositoryPort {
 
     @Override
     public boolean existById(String id) {
+        if (id == null) return false;
         return jpaConstantRepository.existsById(UUID.fromString(id));
     }
 
@@ -58,7 +56,6 @@ public class DatabaseConstantAdapter implements IConstantRepositoryPort {
     }
 
     @Override
-    @Transactional
     public void updateEnabled(String id, boolean enabled) {
         if (id != null) {
             jpaConstantRepository.updateEnabledStatus(UUID.fromString(id), enabled);
@@ -66,7 +63,6 @@ public class DatabaseConstantAdapter implements IConstantRepositoryPort {
     }
 
     @Override
-    @Transactional
     public void updateVisible(String id, boolean visible) {
         if (id != null) {
             jpaConstantRepository.updateVisibleStatus(UUID.fromString(id), visible);

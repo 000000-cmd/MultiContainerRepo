@@ -20,7 +20,7 @@ public class ConstantController {
 
      @PostMapping
     public ResponseEntity<Constant> createConstant(@RequestBody @Validated CreateConstantRequest constantRequest) {
-         Constant constantModel = constantMapper.toModel(constantRequest);
+         Constant constantModel = constantMapper.toDomain(constantRequest);
          Constant createdConstant = constantUseCase.createConstant(constantModel);
          return new ResponseEntity<>(createdConstant, HttpStatus.CREATED);
     }
@@ -31,12 +31,11 @@ public class ConstantController {
         return ResponseEntity.ok(constant);
     }
 
-
     @PutMapping("/{code}")
     public ResponseEntity<Constant> updateConstant(@PathVariable String code,
                                                    @RequestBody CreateConstantRequest request) {
 
-        Constant constantModel = constantMapper.toModel(request);
+        Constant constantModel = constantMapper.toDomain(request);
         constantModel.setCode(code);
         Constant updatedConstant = constantUseCase.updateConstant(constantModel);
         return ResponseEntity.ok(updatedConstant);

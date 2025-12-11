@@ -1,18 +1,21 @@
 package com.saasbeauty.systemservice.infrastructure.adapters.out.persistence.entity;
 
+import com.saasbeauty.saasbeautycommon.persistence.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "constants")
 @Data
-public class ConstantEntity {
+public class ConstantEntity extends BaseEntity {
     @Id
     @UuidGenerator
     @Column(name = "Id",  unique = true, nullable = false)
@@ -26,10 +29,4 @@ public class ConstantEntity {
 
     @Column(name = "Description")
     private String Description;
-
-    @Column(name = "Visible", nullable = false)
-    private boolean Visible;
-
-    @Column(name = "Enabled", nullable = false)
-    private boolean Enabled;
 }

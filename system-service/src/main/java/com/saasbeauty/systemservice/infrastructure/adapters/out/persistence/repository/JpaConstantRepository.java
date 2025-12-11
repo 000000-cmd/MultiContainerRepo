@@ -16,8 +16,6 @@ public interface JpaConstantRepository extends JpaRepository<ConstantEntity, UUI
 
     boolean existsByCode(String code);
 
-    ConstantEntity updateConstant(ConstantEntity constant);
-
     @Modifying
     @Query("UPDATE ConstantEntity c SET c.Enabled = :enabled WHERE c.Id = :id")
     void updateEnabledStatus(UUID id, boolean enabled);

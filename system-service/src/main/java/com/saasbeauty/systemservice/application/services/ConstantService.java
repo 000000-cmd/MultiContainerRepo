@@ -1,12 +1,13 @@
 package com.saasbeauty.systemservice.application.services;
 
-import com.saasbeauty.systemservice.domain.exceptions.BusinessException;
+import com.saasbeauty.saasbeautycommon.domain.exceptions.BusinessException;
 import com.saasbeauty.systemservice.domain.model.Constant;
 import com.saasbeauty.systemservice.domain.ports.in.IConstantUseCase;
 import com.saasbeauty.systemservice.domain.ports.out.IConstantRepositoryPort;
-import com.saasbeauty.systemservice.domain.ports.out.IEventPublisherPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -14,18 +15,18 @@ public class ConstantService implements IConstantUseCase {
 
     private final IConstantRepositoryPort constantRepositoryPort;
 
-
     @Override
+    @Transactional
     public Constant createConstant(Constant constant){
-        if (constantRepositoryPort.existById(constant.getId())){
-            throw new BusinessException("La constante ya existe: " + constant.getCode());
+        if (constantRepositoryPort.existByCode(constant.getCode())){
+            throw new BusinessException("La constante ya existe con el código: " + constant.getCode());
         }
-        constant.setVisible(true);
         constant.setEnabled(true);
-        return constantRepositoryPort.saveConstant((constant));
+        return constantRepositoryPort.saveConstant(constant);
     }
 
     @Override
+    @Transactional
     public Constant updateConstant(Constant newConstantValue) {
         if (newConstantValue.getId() == null && newConstantValue.getCode() != null) {
             Constant existing = constantRepositoryPort.findByCode(newConstantValue.getCode());
@@ -35,7 +36,7 @@ public class ConstantService implements IConstantUseCase {
                 throw new BusinessException("No se encontró la constante para actualizar.");
             }
         }
-        return constantRepositoryPort.saveConstant(newConstantValue);
+        return constantRepositoryPort.updateConstant(newConstantValue);
     }
 
     @Override
@@ -53,16 +54,16 @@ public class ConstantService implements IConstantUseCase {
     }
 
     @Override
+    @Transactional
     public void toggleEnabled(String code, boolean enabled) {
         Constant constant = getByCode(code);
         constantRepositoryPort.updateEnabled(constant.getId(), enabled);
     }
 
     @Override
+    @Transactional
     public void toggleVisible(String code, boolean visible) {
         Constant constant = getByCode(code);
         constantRepositoryPort.updateVisible(constant.getId(), visible);
     }
-
-
 }
