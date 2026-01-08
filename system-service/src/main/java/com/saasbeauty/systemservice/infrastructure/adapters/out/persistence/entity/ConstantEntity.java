@@ -19,14 +19,14 @@ public class ConstantEntity extends BaseEntity {
     @Id
     @UuidGenerator
     @Column(name = "Id",  unique = true, nullable = false)
-    private UUID Id;
+    private UUID id;
 
     @Column(name = "Code", unique = true, nullable = false)
-    private String Code;
+    private String code;
 
     @Column(name = "Value")
-    private String Value;
+    private String value;
 
     @Column(name = "Description")
-    private String Description;
+    private String description;
 }

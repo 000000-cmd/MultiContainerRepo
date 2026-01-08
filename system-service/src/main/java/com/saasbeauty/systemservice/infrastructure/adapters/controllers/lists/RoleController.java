@@ -1,4 +1,4 @@
-package com.saasbeauty.systemservice.infrastructure.adapters.in.web.lists;
+package com.saasbeauty.systemservice.infrastructure.adapters.controllers.lists;
 
 import com.saasbeauty.systemservice.application.dto.request.CreateRoleRequest;
 import com.saasbeauty.systemservice.application.mappers.RoleApplicationMapper;

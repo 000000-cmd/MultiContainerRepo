@@ -23,7 +23,15 @@ public class DatabaseRoleMenuAdapter implements IRoleMenuRepositoryPort {
     public RoleMenu save(RoleMenu domain) {
         RoleMenuEntity entity = mapper.toEntity(domain);
         RoleMenuEntity saved = jpaRepository.save(entity);
-        return mapper.toDomain(saved);
+        RoleMenu result = mapper.toDomain(saved);
+
+        if (result.getRoleCode() == null) {
+            result.setRoleCode(domain.getRoleCode());
+        }
+        if (result.getMenuCode() == null) {
+            result.setMenuCode(domain.getMenuCode());
+        }
+        return result;
     }
 
     @Override

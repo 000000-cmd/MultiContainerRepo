@@ -1,4 +1,4 @@
-package com.saasbeauty.systemservice.infrastructure.adapters.in.web;
+package com.saasbeauty.systemservice.infrastructure.adapters.controllers;
 
 import com.saasbeauty.systemservice.application.dto.request.CreateConstantRequest;
 import com.saasbeauty.systemservice.application.mappers.ConstantApplicationMapper;
@@ -18,11 +18,11 @@ public class ConstantController {
     private final IConstantUseCase constantUseCase;
     private final ConstantApplicationMapper constantMapper;
 
-     @PostMapping
+    @PostMapping
     public ResponseEntity<Constant> createConstant(@RequestBody @Validated CreateConstantRequest constantRequest) {
-         Constant constantModel = constantMapper.toDomain(constantRequest);
-         Constant createdConstant = constantUseCase.createConstant(constantModel);
-         return new ResponseEntity<>(createdConstant, HttpStatus.CREATED);
+        Constant constantModel = constantMapper.toDomain(constantRequest);
+        Constant createdConstant = constantUseCase.create(constantModel);
+        return new ResponseEntity<>(createdConstant, HttpStatus.CREATED);
     }
 
     @GetMapping("/{code}")
@@ -37,28 +37,22 @@ public class ConstantController {
 
         Constant constantModel = constantMapper.toDomain(request);
         constantModel.setCode(code);
-        Constant updatedConstant = constantUseCase.updateConstant(constantModel);
+        Constant updatedConstant = constantUseCase.update(constantModel);
         return ResponseEntity.ok(updatedConstant);
     }
 
     @PatchMapping("/{code}/status")
     public ResponseEntity<Void> toggleEnabled(@PathVariable String code,
                                               @RequestParam boolean enabled) {
-        constantUseCase.toggleEnabled(code, enabled);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/{code}/visibility")
-    public ResponseEntity<Void> toggleVisible(@PathVariable String code,
-                                              @RequestParam boolean visible) {
-        constantUseCase.toggleVisible(code, visible);
+        Constant constant = constantUseCase.getByCode(code);
+        constantUseCase.toggleEnabled(constant.getId(), enabled);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{code}")
     public ResponseEntity<Void> deleteConstant(@PathVariable String code) {
         Constant constant = constantUseCase.getByCode(code);
-        constantUseCase.deleteConstant(constant);
+        constantUseCase.delete(constant.getId());
         return ResponseEntity.noContent().build();
     }
 }

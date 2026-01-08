@@ -19,6 +19,5 @@ public class CreateConstantRequest {
 
     private String description;
 
-    private boolean enabled;
-    private boolean visible;
+    private Boolean enabled;
 }

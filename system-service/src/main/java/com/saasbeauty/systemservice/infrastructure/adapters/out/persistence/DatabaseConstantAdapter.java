@@ -7,65 +7,74 @@ import com.saasbeauty.systemservice.infrastructure.adapters.out.persistence.mapp
 import com.saasbeauty.systemservice.infrastructure.adapters.out.persistence.repository.JpaConstantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
-@Component
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Repository
 @RequiredArgsConstructor
 public class DatabaseConstantAdapter implements IConstantRepositoryPort {
 
-    private final JpaConstantRepository jpaConstantRepository;
-    private final ConstantPersistenceMapper constantPersistenceMapper;
+    private final JpaConstantRepository jpaRepository;
+    private final ConstantPersistenceMapper mapper;
 
     @Override
-    public Constant saveConstant(Constant constant) {
-        ConstantEntity entity = constantPersistenceMapper.toEntity(constant);
-        ConstantEntity saved = jpaConstantRepository.save(entity);
-        return constantPersistenceMapper.toDomain(saved);
+    public Constant save(Constant constant) {
+        ConstantEntity entity = mapper.toEntity(constant);
+        ConstantEntity saved = jpaRepository.save(entity);
+        return mapper.toDomain(saved);
     }
 
     @Override
-    public Constant updateConstant(Constant constant){
-        ConstantEntity entity = constantPersistenceMapper.toEntity(constant);
-        ConstantEntity updated = jpaConstantRepository.save(entity);
-        return constantPersistenceMapper.toDomain(updated);
+    public Constant update(Constant constant) {
+        return save(constant);
     }
 
     @Override
-    public Constant findByCode(String code) {
-        return jpaConstantRepository.findByCode(code)
-                .map(constantPersistenceMapper::toDomain)
-                .orElse(null);
+    public List<Constant> findAll() {
+        return jpaRepository.findAll().stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void deleteConstant(Constant constant) {
-        if (constant.getId() != null) {
-            jpaConstantRepository.deleteById(UUID.fromString(constant.getId()));
+    public Optional<Constant> findById(String id) {
+        if (id == null) return Optional.empty();
+        return jpaRepository.findById(UUID.fromString(id))
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<Constant> findByCode(String code) {
+        return jpaRepository.findByCode(code)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public void deleteById(String id) {
+        if (id != null) {
+            jpaRepository.deleteById(UUID.fromString(id));
         }
     }
 
     @Override
-    public boolean existById(String id) {
-        if (id == null) return false;
-        return jpaConstantRepository.existsById(UUID.fromString(id));
+    public boolean existsByCode(String code) {
+        return jpaRepository.existsByCode(code);
     }
 
     @Override
-    public boolean existByCode(String code) {
-        return jpaConstantRepository.existsByCode(code);
+    public boolean existsById(String id) {
+        if (id == null) return false;
+        return jpaRepository.existsById(UUID.fromString(id));
     }
 
     @Override
     public void updateEnabled(String id, boolean enabled) {
         if (id != null) {
-            jpaConstantRepository.updateEnabledStatus(UUID.fromString(id), enabled);
-        }
-    }
-
-    @Override
-    public void updateVisible(String id, boolean visible) {
-        if (id != null) {
-            jpaConstantRepository.updateVisibleStatus(UUID.fromString(id), visible);
+            jpaRepository.updateEnabledStatus(UUID.fromString(id), enabled);
         }
     }
 }

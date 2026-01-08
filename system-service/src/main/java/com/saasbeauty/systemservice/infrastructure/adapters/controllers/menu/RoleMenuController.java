@@ -1,4 +1,4 @@
-package com.saasbeauty.systemservice.infrastructure.adapters.in.web.menu;
+package com.saasbeauty.systemservice.infrastructure.adapters.controllers.menu;
 
 import com.saasbeauty.systemservice.application.dto.request.menu.CreateRoleMenuRequest;
 import com.saasbeauty.systemservice.application.mappers.menu.RoleMenuApplicationMapper;
